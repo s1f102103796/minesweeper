@@ -26,7 +26,7 @@ const Home = () => {
     [0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0],
   ]);
-
+  //左側から時計回り
   const directions = [
     [-1, 0],
     [-1, -1],
@@ -48,6 +48,7 @@ const Home = () => {
   let col = 0;
   let bomb = 0;
   let cnt = 0;
+
   //input = 初めて押した時
   const jaj = userInputs.flat().filter((input) => input === 1).length === 0;
 
@@ -67,24 +68,54 @@ const Home = () => {
   console.table(userInputs);
 
   const createBoard = () => {
+    cnt = 0;
     for (let py = 0; py < 8; py++) {
       for (let px = 0; px < 8; px++) {
+        cnt = 0;
         if (userInputs[py][px] === 1) {
           for (let s = 0; s < 8; s++) {
             const dx = directions[s][0];
             const dy = directions[s][1];
             // console.log(dx, dy);
+
             if (userInputs[py + dy] !== undefined && bombMap[py + dy][px + dx] === 1) {
               cnt++;
             }
+            //空白連鎖処理
+            // if (cnt === 0) {
+            //   if (userInputs[py + dy] !== undefined && )
+            //   board[py + dy][px + dx] = 0;
+            // }
+            board[py][px] = cnt;
           }
-          board[py][px] = cnt;
-          console.log('updateInputのbombの個数', cnt);
-          console.table(board);
-
-          return board;
+          //押した場所がbombだった場合はbombを表示させる
+          if (userInputs[py] !== undefined && bombMap[py][px] === 1) {
+            board[py][px] = 11;
+          }
         }
       }
+    }
+
+    console.log('updateInputのbombの個数', cnt);
+    console.table(board);
+    return board;
+  };
+
+  const blank = (x: number, y: number) => {
+    if (userInputs[y][x] === 1) {
+      for (let s = 0; s < 8; s++) {
+        const dx = directions[s][0];
+        const dy = directions[s][1];
+
+        if (cnt === 0) {
+          board[y + dy][x + dx] = 1;
+        }
+      }
+      board[y][x] = cnt;
+      console.log('userInputsの8方向を1にする', cnt);
+      console.table(board);
+
+      return board;
     }
   };
 
@@ -102,8 +133,8 @@ const Home = () => {
           row = Math.floor(Math.random() * 9);
           col = Math.floor(Math.random() * 9);
           console.log(row, col);
-          if (updateInput[row][col] !== 1 && bombMap[row][col] !== 1) {
-            bombMap[row][col] = 1;
+          if (updateInput[col][row] !== 1 && bombMap[col][row] !== 1) {
+            bombMap[col][row] = 1;
             bomb++;
           }
         }
@@ -125,6 +156,7 @@ const Home = () => {
               {cell > 0 && cell < 9 && (
                 <div className={styles.number} style={{ backgroundPosition: -30 * cell + 30 }} />
               )}
+              {cell === 11 && <div className={styles.bomb} />}
             </div>
           ))
         )}

@@ -9,11 +9,16 @@
 }
 
 .board {
+  position: relative;
   height: 360px;
   width: 360px;
-  background-color: azure;
-  display: flex;
-  flex-flow: wrap;
+  background-color: rgb(183 183 183);
+  display: grid;
+
+  /* display: flex;
+  flex-flow: wrap; */
+  grid-template-columns: repeat(9, minmax(0, 1fr));
+  grid-template-rows: repeat(9, minmax(0, 1fr));
 }
 
 .cell {
@@ -21,8 +26,8 @@
   width: 40px;
   background-color: gray;
   border: 1px solid;
-  border-color: black;
   white-space: nowrap;
+  position: relative;
 }
 
 .stone {
@@ -32,6 +37,17 @@
   border: 1px solid wheat;
   border: outset 4px;
   position: absolute;
+}
+
+.number {
+  width: 30px;
+  height: 30px;
+  background: url('~/assets/images/icons.png') no-repeat;
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .stone0 {
@@ -44,10 +60,11 @@
   transform: translate(-50%, -50%);
 }
 
-.number {
+.bomb {
   width: 30px;
   height: 30px;
   background: url('~/assets/images/icons.png') no-repeat;
+  background-position: -300px 0;
   border-radius: 50%;
   position: absolute;
   top: 50%;
