@@ -53,7 +53,7 @@
 .stone0 {
   width: 38px;
   height: 38px;
-  background-color: rgb(179 179 179);
+  background-color: gray;
   position: absolute;
   top: 50%;
   left: 50%;

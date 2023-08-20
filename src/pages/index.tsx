@@ -47,10 +47,9 @@ const Home = () => {
   let row = 0;
   let col = 0;
   let bomb = 0;
-  let cnt = 0;
 
   //input = 初めて押した時
-  const jaj = userInputs.flat().filter((input) => input === 1).length === 0;
+  const isFirst = userInputs.flat().filter((input) => input === 1).length === 0;
 
   //自分の状態を表すuserとbomb
   const board = [
@@ -64,84 +63,91 @@ const Home = () => {
     [-1, -1, -1, -1, -1, -1, -1, -1, -1],
     [-1, -1, -1, -1, -1, -1, -1, -1, -1],
   ];
-  console.log('初期');
-  console.table(userInputs);
+  // console.log('初期');
+  // console.table(userInputs);
 
-  const createBoard = () => {
-    cnt = 0;
-    for (let py = 0; py < 8; py++) {
-      for (let px = 0; px < 8; px++) {
-        cnt = 0;
-        if (userInputs[py][px] === 1) {
-          for (let s = 0; s < 8; s++) {
-            const dx = directions[s][0];
-            const dy = directions[s][1];
-            // console.log(dx, dy);
+  const Blank = (x: number, y: number) => {
+    //始めにbombがあったら処理を行わない
+    if (bombMap[x][y] === 1) {
+      console.log('BAKUHATU!');
+      board[x][y] = 11;
+      return;
+    }
+    //8方向のbombcnt
+    let checkbomb = 0;
+    for (let s = 0; s < 8; s++) {
+      const dx = directions[s][0];
+      const dy = directions[s][1];
+      if (bombMap[y + dy] === undefined || bombMap[y + dy][x + dx] === undefined) {
+        continue;
+      }
+      if (bombMap[y + dy][x + dx] === 1) {
+        checkbomb++;
+      }
+    }
+    if (checkbomb >= 1) {
+      board[x][y] = checkbomb;
+      return;
+    }
+    board[x][y] = 0;
 
-            if (userInputs[py + dy] !== undefined && bombMap[py + dy][px + dx] === 1) {
-              cnt++;
-            }
-            //空白連鎖処理
-            // if (cnt === 0) {
-            //   if (userInputs[py + dy] !== undefined && )
-            //   board[py + dy][px + dx] = 0;
-            // }
-            board[py][px] = cnt;
-          }
-          //押した場所がbombだった場合はbombを表示させる
-          if (userInputs[py] !== undefined && bombMap[py][px] === 1) {
-            board[py][px] = 11;
-          }
-        }
+    for (let t = 0; t < 8; t++) {
+      if (x + directions[t][0] < 0 || y + directions[t][1] < 0) {
+        continue;
+      }
+      //Blank(x + directions[t][0], y + directions[t][1]);
+      if (userInputs[y + directions[t][1]][x + directions[t][0]] !== 1) {
+        Blank(x + directions[t][0], y + directions[t][1]);
       }
     }
 
-    console.log('updateInputのbombの個数', cnt);
-    console.table(board);
-    return board;
+    console.log(checkbomb);
   };
 
-  const blank = (x: number, y: number) => {
-    if (userInputs[y][x] === 1) {
-      for (let s = 0; s < 8; s++) {
-        const dx = directions[s][0];
-        const dy = directions[s][1];
-
-        if (cnt === 0) {
-          board[y + dy][x + dx] = 1;
+  const createBoard = () => {
+    for (let py = 0; py < 9; py++) {
+      for (let px = 0; px < 9; px++) {
+        if (userInputs[py][px] === 1) {
+          Blank(py, px);
         }
       }
-      board[y][x] = cnt;
-      console.log('userInputsの8方向を1にする', cnt);
-      console.table(board);
-
-      return board;
     }
+    // console.log('updateInputのbombの個数');
+    // console.table(board);
+    return board;
   };
 
   const onClick = (x: number, y: number) => {
     console.log('選択', y, x);
+    if (userInputs[y][x] === 1) {
+      return; // 既に選択済みの場合は何もしない
+    }
     const updateInput = [...userInputs];
     updateInput[x][y] = 1;
 
     setUserInputs(updateInput);
     console.log('update');
-    console.table(updateInput);
-    if (jaj) {
-      if (updateInput[x][y] === 1) {
-        while (bomb < bombCount) {
-          row = Math.floor(Math.random() * 9);
-          col = Math.floor(Math.random() * 9);
-          console.log(row, col);
-          if (updateInput[col][row] !== 1 && bombMap[col][row] !== 1) {
-            bombMap[col][row] = 1;
-            bomb++;
-          }
+    // console.table(updateInput);
+    if (isFirst) {
+      console.log('aaaa');
+      while (bomb < bombCount) {
+        row = Math.floor(Math.random() * 9);
+        col = Math.floor(Math.random() * 9);
+        console.log(row, col);
+
+        if (updateInput[col][row] !== 1 && bombMap[col][row] !== 1) {
+          bombMap[col][row] = 1;
+          bomb++;
         }
       }
+      setBombMap(bombMap);
     }
+
     console.log('bombmap');
     console.table(bombMap);
+    console.log('board');
+    console.table(board);
+    console.table(userInputs);
   };
   createBoard();
 
