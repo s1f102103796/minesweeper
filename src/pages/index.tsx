@@ -66,42 +66,48 @@ const Home = () => {
   // console.log('初期');
   // console.table(userInputs);
 
-  const Blank = (x: number, y: number) => {
+  const Blank = (y: number, x: number) => {
     //始めにbombがあったら処理を行わない
-    if (bombMap[x][y] === 1) {
+    if (bombMap[y][x] === 1) {
       console.log('BAKUHATU!');
-      board[x][y] = 11;
+      board[y][x] = 11;
       return;
     }
     //8方向のbombcnt
     let checkbomb = 0;
     for (let s = 0; s < 8; s++) {
-      const dx = directions[s][0];
-      const dy = directions[s][1];
+      const dy = directions[s][0];
+      const dx = directions[s][1];
       if (bombMap[y + dy] === undefined || bombMap[y + dy][x + dx] === undefined) {
         continue;
-      }
-      if (bombMap[y + dy][x + dx] === 1) {
+      } else if (bombMap[y + dy][x + dx] === 1) {
         checkbomb++;
       }
+      console.log('hachikai');
     }
+    console.log('checkbomb', checkbomb);
     if (checkbomb >= 1) {
-      board[x][y] = checkbomb;
+      board[y][x] = checkbomb;
       return;
     }
-    board[x][y] = 0;
+    board[y][x] = 0;
 
     for (let t = 0; t < 8; t++) {
-      if (x + directions[t][0] < 0 || y + directions[t][1] < 0) {
+      if (
+        x + directions[t][0] < 0 ||
+        x + directions[t][0] >= 9 ||
+        y + directions[t][1] < 0 ||
+        y + directions[t][1] >= 9
+      ) {
         continue;
       }
       //Blank(x + directions[t][0], y + directions[t][1]);
-      if (userInputs[y + directions[t][1]][x + directions[t][0]] !== 1) {
-        Blank(x + directions[t][0], y + directions[t][1]);
+      if (board[y + directions[t][1]][x + directions[t][0]] === -1) {
+        console.log('qqqqq', y + directions[t][1], x + directions[t][0]);
+        Blank(y + directions[t][1], x + directions[t][0]);
       }
     }
-
-    console.log(checkbomb);
+    // console.log('checkbomb', checkbomb);
   };
 
   const createBoard = () => {
@@ -117,13 +123,13 @@ const Home = () => {
     return board;
   };
 
-  const onClick = (x: number, y: number) => {
+  const onClick = (y: number, x: number) => {
     console.log('選択', y, x);
     if (userInputs[y][x] === 1) {
       return; // 既に選択済みの場合は何もしない
     }
     const updateInput = [...userInputs];
-    updateInput[x][y] = 1;
+    updateInput[y][x] = 1;
 
     setUserInputs(updateInput);
     console.log('update');
